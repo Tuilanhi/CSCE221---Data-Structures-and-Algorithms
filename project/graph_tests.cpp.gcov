@@ -1,0 +1,183 @@
+        -:    0:Source:graph_tests.cpp
+        -:    0:Graph:graph_tests.gcno
+        -:    0:Data:graph_tests.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:/*
+        -:    2:/ File name: graph_tests.cpp
+        -:    3:/ Project number: CSCE 221 Project, Spring 2022
+        -:    4:/ Date file was created: April 22, 2022
+        -:    5:/ Section: 511
+        -:    6:/ Name: Nhi Vu, Joshua Hillis
+        -:    7:/ email address: vuthuynhi@tamu.edu joshuahillis292002@tamu.edu
+        -:    8:/ This cpp file contains the implementation of testing cases for the functions in Graph header files. It creates a graph and add in vertices and edges for the Graph,
+        -:    9:/ and calls the prim and dijsktra function to print out the shortest path from a given vertex to another by calculating its cost.
+        -:   10:*/
+        -:   11:
+        -:   12:#include <iostream>
+        -:   13:#include <sstream>
+        -:   14:#include "graph.h"
+        -:   15:
+        -:   16:using std::cout, std::endl;
+        -:   17:
+        1:   18:int main()
+        -:   19:{
+        1:   20:    std::cout << "make an empty digraph" << std::endl;
+        1:   21:    Graph G;
+        -:   22:
+        1:   23:    std::cout << "add vertices" << std::endl;
+       10:   24:    for (size_t n = 0; n <= 8; n++)
+        -:   25:    {
+        9:   26:        G.add_vertex(n);
+        9:   27:    }
+        -:   28:
+        1:   29:    std::cout << "add directed edges" << std::endl;
+        1:   30:    G.add_edge(5, 6, 1);
+        1:   31:    G.add_edge(8, 7, 2);
+        1:   32:    G.add_edge(4, 2, 3);
+        1:   33:    G.add_edge(8, 6, 4);
+        1:   34:    G.add_edge(8, 5, 5);
+        1:   35:    G.add_edge(5, 8, 6);
+        1:   36:    G.add_edge(6, 7, 7);
+        1:   37:    G.add_edge(7, 2, 8);
+        1:   38:    G.add_edge(7, 4, 9);
+        1:   39:    G.add_edge(0, 2, 10);
+        1:   40:    G.add_edge(4, 1, 11);
+        1:   41:    G.add_edge(6, 4, 12);
+        1:   42:    G.add_edge(1, 2, 13);
+        1:   43:    G.add_edge(1, 0, 14);
+        1:   44:    G.add_edge(5, 3, 15);
+        1:   45:    G.add_edge(6, 3, 16);
+        1:   46:    G.add_edge(4, 3, 17);
+        1:   47:    G.add_edge(3, 0, 18);
+        1:   48:    G.add_edge(3, 1, 19);
+        -:   49:
+        1:   50:    std::cout << "G has " << G.vertex_count() << " vertices" << std::endl;
+        1:   51:    std::cout << "G has " << G.edge_count() << " edges" << std::endl;
+        1:   52:    std::cout << std::endl;
+        -:   53:
+        1:   54:    std::cout << "compute mst path from 0" << std::endl;
+        1:   55:    G.prim(0);
+        -:   56:
+        1:   57:    std::cout << "print minimum spanning paths" << std::endl;
+       10:   58:    for (size_t n = 0; n <= 8; n++)
+        -:   59:    {
+        9:   60:        std::cout << "minimum spanning path from 0 to " << n << std::endl;
+        9:   61:        std::cout << "  ";
+        9:   62:        G.print_path(n);
+        9:   63:    }
+        1:   64:    std::cout << std::endl;
+        -:   65:
+        1:   66:    std::cout << "compute shortest path from 2" << std::endl;
+        1:   67:    G.dijkstra(2);
+        -:   68:
+        1:   69:    std::cout << "print shortest paths" << std::endl;
+        8:   70:    for (size_t n = 1; n <= 7; n++)
+        -:   71:    {
+        7:   72:        std::cout << "shortest path from 2 to " << n << std::endl;
+        7:   73:        std::cout << "  ";
+        7:   74:        G.print_shortest_path(n);
+        7:   75:    }
+        -:   76:
+        -:   77:    // Testing copy constructor and copy assignment
+        1:   78:    Graph J(G);
+        1:   79:    Graph K;
+        1:   80:    K.operator=(G);
+        -:   81:
+        -:   82:    // Testing remove vertex
+        1:   83:    K.remove_vertex(7);
+        1:   84:    K.remove_vertex(6);
+        1:   85:    K.remove_vertex(1);
+        -:   86:
+        -:   87:    // Testing remove edge
+        1:   88:    K.remove_edge(2, 5);
+        -:   89:
+        -:   90:    // Test is_path
+        1:   91:    K.is_path(2);
+        -:   92:
+        1:   93:    Graph X;
+        1:   94:    Graph Y;
+        -:   95:
+        -:   96:    // Make another graph
+        7:   97:    for (int i = 1; i <= 6; i++)
+        -:   98:    {
+        6:   99:        X.add_vertex(i);
+        6:  100:    }
+        -:  101:
+        -:  102:    // Test add_edges more
+        1:  103:    X.add_edge(1, 5, 6);
+        1:  104:    X.add_edge(2, 6, 3);
+        1:  105:    X.add_edge(2, 1, 1);
+        1:  106:    X.add_edge(2, 4, 3);
+        1:  107:    X.add_edge(3, 4, 3);
+        1:  108:    X.add_edge(3, 6, 3);
+        1:  109:    X.add_edge(5, 3, 3);
+        1:  110:    X.add_edge(6, 4, 4);
+        -:  111:
+        -:  112:    // Another graph
+        1:  113:    Y = X;
+        -:  114:
+        1:  115:    X.dijkstra(2);
+        -:  116:
+        1:  117:    std::cout << "\n\n";
+        -:  118:
+        1:  119:    std::cout << "print shortest paths for X: " << std::endl;
+        7:  120:    for (size_t n = 1; n <= 6; n++)
+        -:  121:    {
+        6:  122:        std::cout << "shortest path from 2 to " << n << std::endl;
+        6:  123:        std::cout << "  ";
+        6:  124:        X.print_path(n);
+        6:  125:    }
+        1:  126:    std::cout << std::endl;
+        -:  127:
+        1:  128:    cout << "Calculating the cost between (1, 5): " << X.cost(1, 5) << endl;
+        -:  129:
+        1:  130:    cout << "Does Graph X contains vertex 3? " << boolalpha << X.contains_vertex(3) << endl;
+        1:  131:    cout << "Is edge (3, 4) available? " << boolalpha << X.contains_edge(3, 4) << endl;
+        -:  132:
+        -:  133:    // Test remove vertex more
+        1:  134:    X.remove_vertex(2);
+        1:  135:    X.remove_vertex(3);
+        -:  136:
+        1:  137:    cout << "Does Graph X contains vertex 3? " << boolalpha << X.contains_vertex(3) << endl;
+        1:  138:    cout << "Is edge (3, 4) available? " << boolalpha << X.contains_edge(3, 4) << endl;
+        1:  139:    cout << "Calculating the cost between (3, 4): " << X.cost(3, 4) << endl;
+        1:  140:    cout << endl;
+        -:  141:
+        1:  142:    Y.prim(2);
+        -:  143:
+        1:  144:    std::cout << "print minimum spanning paths for Y: " << std::endl;
+        7:  145:    for (size_t n = 1; n <= 6; n++)
+        -:  146:    {
+        6:  147:        std::cout << "shortest path from 2 to " << n << std::endl;
+        6:  148:        std::cout << "  ";
+        6:  149:        Y.print_shortest_path(n);
+        6:  150:    }
+        1:  151:    std::cout << std::endl;
+        -:  152:
+        1:  153:    Graph Z;
+        1:  154:    Z = Y;
+        -:  155:
+        -:  156:    // Test for no path, distance in a non-existent path, non-existent vertex
+        1:  157:    std::cout << "Printing non existent path: " << std::endl;
+        1:  158:    Z.print_shortest_path(28);
+        1:  159:    std::cout << "Distance for non existent path: " << Z.distance(28) << std::endl;
+        1:  160:    std::cout << "Z contains vertex 28: " << Z.contains_vertex(28) << std::endl;
+        -:  161:
+        -:  162:    // Try and add an edge to a non-existent vertex
+        1:  163:    Z.add_edge(2, 28, 4);
+        -:  164:    // Try and add a vertex that's already in the graph, and remove a non-existent vertex
+        1:  165:    Z.add_vertex(2);
+        1:  166:    Z.remove_vertex(28);
+        -:  167:    // Try removing a non-existent edge
+        1:  168:    Z.remove_edge(2, 28);
+        -:  169:    // Test self assignment
+        1:  170:    Z = Z;
+        -:  171:    // Try prim's and dijkstra's from a non-existent vertex
+        1:  172:    Z.prim(28);
+        1:  173:    Z.dijkstra(28);
+        -:  174:
+        -:  175:    // Print non-existent path
+        1:  176:    Z.print_path(28);
+        1:  177:    return 0;
+        1:  178:}

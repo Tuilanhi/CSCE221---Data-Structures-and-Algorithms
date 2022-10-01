@@ -1,0 +1,443 @@
+        -:    0:Source:./graph.h
+        -:    0:Graph:graph_tests.gcno
+        -:    0:Data:graph_tests.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:/*
+        -:    2:/ File name: graph.h
+        -:    3:/ Project number: CSCE 221 Project, Spring 2022
+        -:    4:/ Date file was created: April 22, 2022
+        -:    5:/ Section: 511
+        -:    6:/ Name: Nhi Vu, Joshua Hillis
+        -:    7:/ email address: vuthuynhi@tamu.edu joshuahillis292002@tamu.edu
+        -:    8:/ This header file contains the implementation of the functions in class Graph, in which it creates a graph, add vertex and edges to the graph, checks if the graph
+        -:    9:/ contains a given vertex or edge, remove a given vertex and edge. class Graph also includes the implementation of Prim and Dijkstra that finds the shortest path between
+        -:   10:/ 2 vertices, and prints out the path.
+        -:   11:*/
+        -:   12:
+        -:   13:#ifndef GRAPH_H
+        -:   14:#define GRAPH_H
+        -:   15:
+        -:   16:#include <list>
+        -:   17:#include <unordered_set>
+        -:   18:#include <unordered_map>
+        -:   19:#include <cmath>
+        -:   20:#include <iostream>
+        -:   21:#include <sstream>
+        -:   22:#include <cstddef>
+        -:   23:#include <queue>
+        -:   24:
+        -:   25:using namespace std;
+        -:   26:
+        -:   27:class Graph
+        -:   28:{
+        -:   29:private:
+        -:   30:    struct Node
+        -:   31:    {
+        -:   32:        size_t src_id;
+        -:   33:        list<Node *> adj;
+       45:   34:        double cost = INFINITY;
+       45:   35:        bool known = false;
+       45:   36:        Node *path = nullptr;
+      135:   37:        Node(size_t id) : src_id(id), adj() {}
+        -:   38:    };
+        -:   39:    unordered_map<size_t, unordered_map<size_t, double> > edge;
+        -:   40:    unordered_map<size_t, Node *> vertex;
+        -:   41:
+        -:   42:public:
+        -:   43:    // Task 1
+        -:   44:    Graph();
+        -:   45:    Graph(const Graph &other);
+        -:   46:    Graph &operator=(const Graph &other);
+        -:   47:    ~Graph();
+        -:   48:
+        -:   49:    size_t vertex_count() const;
+        -:   50:    size_t edge_count() const;
+        -:   51:
+        -:   52:    bool contains_vertex(size_t id) const;
+        -:   53:    bool contains_edge(size_t src, size_t dest) const;
+        -:   54:    double cost(size_t src, size_t dest) const;
+        -:   55:
+        -:   56:    bool add_vertex(size_t id);
+        -:   57:    bool add_edge(size_t src, size_t dest, double weight = 1);
+        -:   58:    bool remove_vertex(size_t id);
+        -:   59:    bool remove_edge(size_t src, size_t dest);
+        -:   60:
+        -:   61:    // Task 2
+        -:   62:    void prim(size_t source_id);
+        -:   63:    bool is_path(size_t id) const;
+        -:   64:    void print_path(size_t dest_id, std::ostream &os = std::cout) const;
+        -:   65:    // Task 3
+        -:   66:    void dijkstra(size_t source_id);
+        -:   67:    double distance(size_t id) const;
+        -:   68:    void print_help(size_t id, std::ostream &os = std::cout) const;
+        -:   69:    void print_shortest_path(size_t dest_id, std::ostream &os = std::cout) const;
+        -:   70:};
+        -:   71:
+        -:   72:// name: constructor
+        -:   73:// precondition: the graph has not been initialized
+        -:   74:// postcondition: the graph has been created
+       10:   75:Graph::Graph() : edge(), vertex() {}
+        -:   76:
+        -:   77:// name: copy constructor
+        -:   78:// precondition: the graph has not constructed its copied version
+        -:   79:// postcondition: the graph has constructor a copied version of it
+        2:   80:Graph::Graph(const Graph &other)
+        1:   81:{
+       10:   82:    for (auto V : other.vertex)
+        -:   83:    {
+        9:   84:        add_vertex(V.first);
+        -:   85:    }
+        -:   86:
+        9:   87:    for (auto A : other.edge)
+        -:   88:    {
+       27:   89:        for (auto B : A.second)
+        -:   90:        {
+       19:   91:            add_edge(A.first, B.first, B.second);
+        -:   92:        }
+        8:   93:    }
+        2:   94:}
+        -:   95:// name: copy assignment
+        -:   96:// precondition: the graph has not copied the orig graph to the copied version
+        -:   97:// postcondition: the graph has copied the orig graph to the copied version
+        4:   98:Graph &Graph::operator=(const Graph &other)
+        -:   99:{
+        4:  100:    if (&other == this)
+        -:  101:    {
+        1:  102:        return *this;
+        -:  103:    }
+        -:  104:
+        3:  105:    edge.clear();
+        -:  106:
+       24:  107:    for (auto V : other.vertex)
+        -:  108:    {
+       21:  109:        add_vertex(V.first);
+        -:  110:    }
+        -:  111:
+       21:  112:    for (auto A : other.edge)
+        -:  113:    {
+       53:  114:        for (auto B : A.second)
+        -:  115:        {
+       35:  116:            add_edge(A.first, B.first, B.second);
+        -:  117:        }
+       18:  118:    }
+        -:  119:
+        3:  120:    return *this;
+        4:  121:}
+        -:  122:
+        -:  123:// name: destructor
+        -:  124:// precondition: the graph has not destroyed itself
+        -:  125:// postcondition: the graph has been destroyed
+       12:  126:Graph::~Graph()
+        6:  127:{
+        6:  128:    edge.clear();
+        -:  129:
+       46:  130:    for (auto V : vertex)
+        -:  131:    {
+       40:  132:        delete V.second;
+        -:  133:    }
+       12:  134:}
+        -:  135:
+        -:  136:// name: vertex_count
+        -:  137:// precondition: do not know the number of vertices in the graph
+        -:  138:// postcondition: returns the number of vertices in the graph
+        1:  139:size_t Graph::vertex_count() const
+        -:  140:{
+        1:  141:    return vertex.size();
+        -:  142:}
+        -:  143:
+        -:  144:// name: edge_count
+        -:  145:// precondition: do not know the number of edges in the graph
+        -:  146:// postcondition: returns the number of edges in the graph
+        1:  147:size_t Graph::edge_count() const
+        -:  148:{
+        1:  149:    size_t sum = 0;
+       10:  150:    for (auto current : vertex)
+        -:  151:    {
+        9:  152:        sum += current.second->adj.size();
+        -:  153:    }
+        1:  154:    return sum;
+        -:  155:}
+        -:  156:
+        -:  157:// name: contains_edge
+        -:  158:// precondition: do not know if the graph contains the given vertex
+        -:  159:// postcondition: returns true if the graph contains the given vertex and false otherwise
+      471:  160:bool Graph::contains_vertex(size_t id) const
+        -:  161:{
+      471:  162:    if (vertex.count(id) == 1)
+        -:  163:    {
+      413:  164:        return true;
+        -:  165:    }
+       58:  166:    return false;
+      471:  167:}
+        -:  168:
+        -:  169:// name: contains_edge
+        -:  170:// precondition: do not know if the graph contains the given edge
+        -:  171:// postcondition: returns true if the graph contains the given edge and false otherwise
+      105:  172:bool Graph::contains_edge(size_t src, size_t dest) const
+        -:  173:{
+      105:  174:    if (contains_vertex(src) && contains_vertex(dest))
+        -:  175:    {
+      101:  176:        return edge.count(src) == 1 && edge.at(src).count(dest) == 1;
+        -:  177:    }
+        4:  178:    return false;
+      105:  179:}
+        -:  180:
+        -:  181:// name: cost
+        -:  182:// precondition: do not know the weight of the edge between src and dest
+        -:  183:// postcondition: returns the weight of the edge between src and dest, or infinity if none exists
+       19:  184:double Graph::cost(size_t src, size_t dest) const
+        -:  185:{
+       19:  186:    if (contains_edge(src, dest))
+        -:  187:    {
+       18:  188:        return edge.at(src).at(dest);
+        -:  189:    }
+        1:  190:    return INFINITY;
+       19:  191:}
+        -:  192:
+        -:  193:// name: add_vertex
+        -:  194:// precondition: do not the know if the given vertex has already been inserted
+        -:  195:// postcondition: returns true if the given vertex has been added successfully and false otherwise
+       46:  196:bool Graph::add_vertex(size_t id)
+        -:  197:{
+        -:  198:    // Check that the vertex isn't already in the matrix
+       46:  199:    if (contains_vertex(id))
+        -:  200:    {
+        1:  201:        return false;
+        -:  202:    }
+        -:  203:
+       45:  204:    vertex[id] = new Node(id);
+       45:  205:    return true;
+       46:  206:}
+        -:  207:
+        -:  208:// name: add_edge
+        -:  209:// precondition: do not the know if the given edge has already been inserted
+        -:  210:// postcondition: returns true if the given edge has already been added successfully and false otherwise
+       82:  211:bool Graph::add_edge(size_t src, size_t dest, double weight)
+        -:  212:{
+       82:  213:    if (contains_edge(src, dest) || !contains_vertex(src) || !contains_vertex(dest))
+        -:  214:    {
+        1:  215:        return false;
+        -:  216:    }
+       81:  217:    edge[src][dest] = weight;
+       81:  218:    vertex.at(src)->adj.push_back(vertex.at(dest));
+       81:  219:    return true;
+       82:  220:}
+        -:  221:
+        -:  222:// name: remove_vertex
+        -:  223:// precondition: do not the know if the vertex has been successfully removed
+        -:  224:// precondition: returns true if the vertex has been removed and false otherwise
+        6:  225:bool Graph::remove_vertex(size_t id)
+        -:  226:{
+        6:  227:    if (!contains_vertex(id))
+        -:  228:    {
+        1:  229:        return false;
+        -:  230:    }
+        -:  231:
+        -:  232:    // Clear the destination nodes from the source node, then delete the source
+        5:  233:    Node *current = vertex.at(id);
+       40:  234:    for (auto neighbor : vertex)
+        -:  235:    {
+       35:  236:        neighbor.second->adj.remove(current);
+       35:  237:        edge[neighbor.first].erase(current->src_id);
+        -:  238:    }
+        -:  239:
+        5:  240:    edge.erase(current->src_id);
+        -:  241:    // Erase the vertex
+        5:  242:    vertex.erase(current->src_id);
+        -:  243:
+        5:  244:    delete current;
+        -:  245:
+        5:  246:    return true;
+        6:  247:}
+        -:  248:
+        -:  249:// name: remove_edge
+        -:  250:// precondition: do not know if the edge is removed
+        -:  251:// postcondition: returns true if the edge is successfully removed and false otherwise
+        2:  252:bool Graph::remove_edge(size_t src, size_t dest)
+        -:  253:{
+        2:  254:    if (!contains_edge(src, dest))
+        -:  255:    {
+        2:  256:        return false;
+        -:  257:    }
+        -:  258:    // easier than vertex
+    #####:  259:    edge.at(src).erase(dest);
+    #####:  260:    vertex.at(src)->adj.remove(vertex.at(dest));
+    #####:  261:    return true;
+        2:  262:}
+        -:  263:
+        -:  264:// name: prim
+        -:  265:// precondition: do not know the minimum spanning tree from the specified source vertex to all other vertices
+        -:  266:// postcondition: compute the minimum spanning tree from the specified source vertex to all other vertices in the graph
+        3:  267:void Graph::prim(size_t source_id)
+        -:  268:{
+       24:  269:    for (auto [v_id, v] : vertex)
+        -:  270:    {
+       21:  271:        v->known = false;
+       21:  272:        v->cost = INFINITY;
+       21:  273:        v->path = nullptr;
+       42:  274:        v->src_id = v_id;
+        -:  275:    }
+        -:  276:
+        3:  277:    if (contains_vertex(source_id))
+        -:  278:    {
+        2:  279:        Node *v = vertex.at(source_id);
+        -:  280:
+        2:  281:        v->cost = 0;
+        -:  282:
+        5:  283:        auto cmp = [](Node *left, Node *right)
+        5:  284:        { return left->cost > right->cost; };
+        2:  285:        priority_queue<Node *, vector<Node *>, decltype(cmp)> pq(cmp);
+        2:  286:        pq.push(v);
+        -:  287:
+       10:  288:        while (!pq.empty())
+        -:  289:        {
+        8:  290:            v = pq.top();
+        8:  291:            pq.pop();
+        8:  292:            v->cost = 0;
+        8:  293:            v->known = true;
+        -:  294:
+       17:  295:            for (auto iterator : v->adj)
+        -:  296:            {
+        9:  297:                double path_cost = cost(v->src_id, iterator->src_id);
+        9:  298:                if (iterator->known == false)
+        -:  299:                {
+        7:  300:                    if (iterator->cost > path_cost)
+        -:  301:                    {
+        6:  302:                        iterator->cost = path_cost;
+        6:  303:                        iterator->path = v;
+        6:  304:                        pq.push(iterator);
+        6:  305:                    }
+        7:  306:                }
+        -:  307:            }
+        -:  308:        }
+        2:  309:    }
+        -:  310:    // if vertex does not exist
+        -:  311:    else
+        -:  312:    {
+        1:  313:        return;
+        -:  314:    }
+        3:  315:}
+        -:  316:
+        -:  317:// name: is_path
+        -:  318:// precondition: do not know if theres a path from prim source vertex to the destination vertex
+        -:  319:// postcondition: returns true if there is a path from prim source vertex to the destination vertex
+       29:  320:bool Graph::is_path(size_t id) const
+        -:  321:{
+       29:  322:    Node *current_node = vertex.at(id);
+       29:  323:    if (current_node->cost == INFINITY && current_node->known == false)
+        -:  324:    {
+       14:  325:        return false;
+        -:  326:    }
+       15:  327:    return true;
+       29:  328:}
+        -:  329:
+        -:  330:// name: print_help
+        -:  331:// precondition: prim and dijsktra are not pretty printing
+        -:  332:// postcondition: help prim and dijsktra are pretty printing
+       32:  333:void Graph::print_help(size_t id, ostream &os) const
+        -:  334:{
+       32:  335:    Node *node = vertex.at(id);
+       32:  336:    if (node->path == nullptr)
+        -:  337:    {
+       15:  338:        os << node->src_id;
+       15:  339:        return;
+        -:  340:    }
+       17:  341:    print_help(node->path->src_id, os);
+       17:  342:    os << " --> " << node->src_id;
+       32:  343:}
+        -:  344:
+        -:  345:// name: print_path
+        -:  346:// precondition: the minimum spanning path from the prim source vertex to the specified destination vertex in a --> has not been printed
+        -:  347:// postcondition: the minimum spanning path from the prim source vertex to the specified destination vertex in a --> has been printed
+       16:  348:void Graph::print_path(size_t dest_id, ostream &os) const
+        -:  349:{
+       16:  350:    if (!contains_vertex(dest_id) || !is_path(dest_id))
+        -:  351:    {
+        8:  352:        os << "<no path>\n";
+        8:  353:        return;
+        -:  354:    }
+        8:  355:    print_help(dest_id, os);
+        8:  356:    os << endl;
+       16:  357:}
+        -:  358:
+        -:  359:// name: dijkstra
+        -:  360:// precondition: the shortest path from the specified source vertex to all vertices in the graph has not been computed
+        -:  361:// postcondition: returns the shortest path from the specified source vertex to all vertices in the graph
+        3:  362:void Graph::dijkstra(size_t source_id)
+        -:  363:{
+       24:  364:    for (auto [v_id, v] : vertex)
+        -:  365:    {
+       21:  366:        v->known = false;
+       21:  367:        v->cost = INFINITY;
+       21:  368:        v->path = nullptr;
+       42:  369:        v->src_id = v_id;
+        -:  370:    }
+        -:  371:
+        3:  372:    if (contains_vertex(source_id))
+        -:  373:    {
+        2:  374:        Node *v = vertex.at(source_id);
+        -:  375:
+        2:  376:        v->cost = 0;
+        -:  377:
+        5:  378:        auto cmp = [](Node *left, Node *right)
+        5:  379:        { return left->cost > right->cost; };
+        2:  380:        priority_queue<Node *, vector<Node *>, decltype(cmp)> pq(cmp);
+        2:  381:        pq.push(v);
+        -:  382:
+        9:  383:        while (!pq.empty())
+        -:  384:        {
+        7:  385:            v = pq.top();
+        7:  386:            pq.pop();
+        7:  387:            v->known = true;
+       15:  388:            for (auto neighbor : v->adj)
+        -:  389:            {
+        8:  390:                double total_cost = v->cost + cost(v->src_id, neighbor->src_id);
+        8:  391:                if (neighbor->known == false)
+        -:  392:                {
+        6:  393:                    if (neighbor->cost > total_cost)
+        -:  394:                    {
+        5:  395:                        neighbor->cost = total_cost;
+        5:  396:                        neighbor->path = v;
+        5:  397:                        pq.push(neighbor);
+        5:  398:                    }
+        6:  399:                }
+        -:  400:            }
+        -:  401:        }
+        2:  402:    }
+        -:  403:    // vertex does not exist
+        -:  404:    else
+        -:  405:    {
+        1:  406:        return;
+        -:  407:    }
+        -:  408:    // TODO
+        3:  409:}
+        -:  410:
+        -:  411:// name: distance
+        -:  412:// precondition: the cost of the shortest path from the dijkstra vertex to the specified destination vertex in unknown
+        -:  413:// postcondition: returns the cost of the shortest path from the dijkstra vertex to the specified destination vertex in the graph
+        8:  414:double Graph::distance(size_t id) const
+        -:  415:{
+        8:  416:    if (contains_vertex(id))
+        -:  417:    {
+        7:  418:        Node *v = vertex.at(id);
+        7:  419:        return v->cost;
+        -:  420:    }
+        1:  421:    return INFINITY;
+        8:  422:}
+        -:  423:
+        -:  424:// name: print_shortest_path
+        -:  425:// precondition: the shortest path from the Dijkstra source vertex to the specified destination vertex has not been printed
+        -:  426:// postcondition: the shortest path from the Dijkstra source vertex to the specified destination vertex has been printed
+       14:  427:void Graph::print_shortest_path(size_t dest_id, ostream &os) const
+        -:  428:{
+       14:  429:    if (!contains_vertex(dest_id) || !is_path(dest_id))
+        -:  430:    {
+        7:  431:        os << "<no path>\n";
+        7:  432:        return;
+        -:  433:    }
+        7:  434:    print_help(dest_id, os);
+        7:  435:    os << " distance: " << distance(dest_id);
+        7:  436:    os << endl;
+       14:  437:}
+        -:  438:#endif // GRAPH_H
