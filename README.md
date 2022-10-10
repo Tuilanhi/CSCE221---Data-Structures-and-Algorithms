@@ -1,4 +1,4 @@
-# CSCE221-Data-Structures-and-Algorithms
+# Data-Structures-and-Algorithms
 
 ## About
 
